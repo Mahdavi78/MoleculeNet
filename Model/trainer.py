@@ -80,6 +80,7 @@ class Trainer:
             'val_loss': [] if val_loader else None
         }
         
+        interval = len(train_loader) // 8
         # Training loop
         for epoch in range(num_epochs):
             # Training phase
@@ -108,17 +109,18 @@ class Trainer:
                                        epoch * len(train_loader) + batch_idx)
                 
                 # Print progress
-                if batch_idx % 40 == 0:
+                if batch_idx % interval == 0:
                     print(f'Epoch: {epoch+1}/{num_epochs} '
                           f'Batch: {batch_idx}/{len(train_loader)} '
                           f'Loss: {loss.item():.4f}')
                     
+                    '''
                     # Log gradients for each parameter
                     for name, param in self.model.named_parameters():
                         if param.grad is not None:
                             self.writer.add_histogram(f'Gradients/{name}', param.grad.data,
                                                        epoch * len(train_loader) + batch_idx)
-                    
+                    '''
 
             # Calculate average training loss
             train_loss /= len(train_loader)
@@ -139,7 +141,7 @@ class Trainer:
             for name, param in self.model.named_parameters():
                 self.writer.add_histogram(f'Weights/{name}', param.data, epoch)
             
-            
+
             # Validation phase
             if val_loader:
                 val_loss = self.evaluate(val_loader)
